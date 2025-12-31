@@ -352,8 +352,8 @@
             <div class="countdown-label">Секунд</div>
           </div>
         </div>
-        <div class="timezone">
-          <i class="fas fa-clock"></i> Московское время (MSK)
+        <div class="timezone" id="timezoneDisplay">
+          <i class="fas fa-clock"></i> Московское время (MSK): загрузка...
         </div>
       </div>
 
@@ -517,11 +517,22 @@
       setTimeout(() => clearInterval(interval), 15000);
     }
 
-    // === Упрощенная функция для получения MSK времени ===
+    // === ПРАВИЛЬНАЯ функция для получения MSK времени ===
     function getCurrentMSKTime() {
-      // Простой способ: UTC + 3 часа
-      const nowUTC = Date.now();
-      return new Date(nowUTC + (3 * 60 * 60 * 1000));
+      // Простой и надежный способ: используем локальное время и прибавляем разницу для MSK
+      const now = new Date();
+      
+      // Получаем смещение UTC в минутах для локального времени
+      const localOffset = now.getTimezoneOffset(); // в минутах
+      
+      // MSK = UTC+3 = UTC-(-180 минут)
+      const mskOffset = -180; // MSK UTC+3 = -180 минут
+      
+      // Разница между локальным временем и MSK в миллисекундах
+      const offsetDiff = (mskOffset - localOffset) * 60 * 1000;
+      
+      // Создаем MSK время
+      return new Date(now.getTime() + offsetDiff);
     }
 
     // === Countdown Logic - ИСПРАВЛЕНА ===
@@ -530,9 +541,23 @@
       
       const nowMSK = getCurrentMSKTime();
       
+      // Обновляем отображение времени
+      const timezoneEl = document.getElementById('timezoneDisplay');
+      const mskTimeStr = nowMSK.toLocaleString('ru-RU', { 
+        timeZone: 'Europe/Moscow',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+      timezoneEl.innerHTML = `<i class="fas fa-clock"></i> Московское время (MSK): ${mskTimeStr}`;
+      
       // Для отладки - выводим текущее время
-      console.log('Текущее время MSK:', nowMSK.toLocaleString('ru-RU'));
-      console.log('Дата:', nowMSK.getDate(), 'Месяц:', nowMSK.getMonth() + 1, 'Год:', nowMSK.getFullYear());
+      console.log('Текущее время MSK (правильное):', nowMSK.toLocaleString('ru-RU'));
+      console.log('Часы:', nowMSK.getHours(), 'Минуты:', nowMSK.getMinutes());
       
       // Получаем компоненты даты
       const currentYear = nowMSK.getFullYear();
@@ -540,23 +565,25 @@
       const currentDate = nowMSK.getDate(); // 1-31
       const currentHours = nowMSK.getHours();
       
-      // Определяем целевой Новый Год
+      console.log('Дата в MSK:', currentDate, 'Месяц:', currentMonth + 1, 'Год:', currentYear, 'Часы:', currentHours);
+      
+      // Определяем, когда наступит следующий Новый Год
       let targetYear;
       
-      // Если сегодня 1 января, то Новый Год уже наступил
-      if (currentMonth === 0 && currentDate === 1 && currentHours < 1) {
-        // Сегодня 1 января раннее утро - Новый Год уже наступил
+      // ПРОВЕРКА: Если сегодня 1 января 2026 года
+      // Сейчас 22:12 1 января 2026 - Новый Год УЖЕ наступил!
+      if (currentYear === 2026 && currentMonth === 0 && currentDate === 1) {
+        console.log('СЕГОДНЯ 1 ЯНВАРЯ 2026! Новый Год уже наступил!');
         showNewYearGreetings();
         return;
       }
       
-      // Если мы после 1 января, следующий Новый Год в следующем году
-      if ((currentMonth === 0 && currentDate === 1) || (currentMonth > 0)) {
-        // Уже январь или позже в этом году
-        targetYear = currentYear + 1;
+      // Если мы после 1 января 2026, следующий Новый Год в 2027
+      if (currentYear > 2026 || (currentYear === 2026 && currentMonth > 0)) {
+        targetYear = 2027;
       } else {
-        // Мы еще в прошлом году (декабрь)
-        targetYear = currentYear;
+        // Если мы все еще в 2025 или ранее
+        targetYear = 2026;
       }
       
       // Целевая дата - 1 января targetYear, 00:00 MSK
@@ -585,20 +612,11 @@
       document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
       document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
       
-      // Обновляем отображение времени
-      const timezoneEl = document.querySelector('.timezone');
-      const mskTimeStr = nowMSK.toLocaleString('ru-RU', { 
-        timeZone: 'Europe/Moscow', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
-      });
-      timezoneEl.innerHTML = `<i class="fas fa-clock"></i> Московское время (MSK): ${mskTimeStr}`;
-      
       // Выводим отладочную информацию
       console.log('Текущее MSK:', nowMSK.toLocaleString('ru-RU'));
       console.log('Целевой НГ:', targetMSK.toLocaleString('ru-RU'));
       console.log('Осталось дней:', days);
+      console.log('Осталось часов:', hours);
     }
 
     function showNewYearGreetings() {
@@ -634,9 +652,6 @@
       startSnowPhysics();
       updateCountdown();
       setInterval(updateCountdown, 1000);
-      
-      // Исправляем подзаголовок на 2026 год
-      document.querySelector('.subtitle').textContent = 'Обратный отсчет до Нового Года 2026';
     });
   </script>
 </body>
