@@ -132,6 +132,8 @@
       margin-top: 20px;
     }
     .timezone i { color: #4cc9f0; margin-right: 8px; }
+    
+    /* ИСПРАВЛЕННЫЙ КОНТЕЙНЕР ДЛЯ ПОЗДРАВЛЕНИЙ */
     .greeting-container {
       display: none;
       background: rgba(10, 14, 41, 0.9);
@@ -143,8 +145,12 @@
       max-width: 900px;
       backdrop-filter: blur(10px);
       position: relative;
-      overflow: hidden;
+      /* ИСПРАВЛЕНИЕ: убрали overflow: hidden */
+      overflow: visible;
+      min-height: fit-content;
+      height: auto;
     }
+    
     .admin-title {
       font-family: 'Dancing Script', cursive;
       font-size: 3.5rem;
@@ -155,6 +161,8 @@
       animation: titleAppear 2s ease-out forwards;
       opacity: 0;
     }
+    
+    /* ИСПРАВЛЕННЫЕ СООБЩЕНИЯ */
     .greeting-message {
       display: none;
       font-size: 1.3rem;
@@ -168,7 +176,14 @@
       animation: messageAppear 1.5s ease-out forwards;
       opacity: 0;
       transform: translateY(20px);
+      /* ИСПРАВЛЕНИЕ: гарантируем полное отображение текста */
+      overflow: visible;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      max-width: 100%;
     }
+    
     .greeting-author {
       font-family: 'Playfair Display', serif;
       font-size: 2rem;
@@ -190,6 +205,7 @@
       margin-top: 40px;
       animation: finalAppear 2s ease-out forwards;
       opacity: 0;
+      overflow: visible;
     }
     .final-title {
       font-family: 'Playfair Display', serif;
@@ -289,6 +305,8 @@
       0%, 100% { transform: translateY(0); opacity: 0.65; }
       50% { transform: translateY(-8px); opacity: 0.85; }
     }
+    
+    /* Адаптивность */
     @media (max-width: 768px) {
       .countdown-item { min-width: 120px; padding: 20px 10px; }
       .countdown-value { font-size: 2.5rem; }
@@ -296,19 +314,50 @@
       .logo { font-size: 2.2rem; }
       .countdown-title { font-size: 1.8rem; }
       .countdown-container { padding: 30px 20px; }
-      .admin-title { font-size: 2.5rem; }
-      .greeting-author { font-size: 1.6rem; }
-      .greeting-message { font-size: 1.1rem; padding: 15px; }
-      .final-title { font-size: 2rem; }
-      .final-subtitle { font-size: 2.2rem; }
+      
+      /* Адаптивность для поздравлений */
+      .greeting-container { 
+        padding: 25px 15px; 
+      }
+      .admin-title { 
+        font-size: 2.5rem; 
+        margin-bottom: 30px;
+      }
+      .greeting-author { 
+        font-size: 1.6rem; 
+      }
+      .greeting-message { 
+        font-size: 1.1rem; 
+        padding: 15px; 
+        line-height: 1.6;
+      }
+      .final-title { 
+        font-size: 2rem; 
+      }
+      .final-subtitle { 
+        font-size: 2.2rem; 
+      }
     }
+    
     @media (max-width: 576px) {
       .countdown-item { min-width: 80px; padding: 15px 5px; }
       .countdown-value { font-size: 2rem; }
       .countdown-label { font-size: 0.8rem; }
       .logo { font-size: 1.8rem; }
       .countdown { gap: 10px; }
-      .admin-title { font-size: 2rem; }
+      
+      /* Адаптивность для поздравлений на очень маленьких экранах */
+      .admin-title { 
+        font-size: 2rem; 
+        margin-bottom: 20px;
+      }
+      .greeting-container { 
+        padding: 20px 10px; 
+      }
+      .greeting-message { 
+        font-size: 1rem; 
+        padding: 12px;
+      }
     }
   </style>
 </head>
